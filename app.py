@@ -20,19 +20,21 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL is not set")
 
-def query_db(query, args=(), fetch=True, one=False):
+def query_db(query, args=(), one=False, commit=False):
     conn = psycopg2.connect(DATABASE_URL, sslmode="require")
     try:
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cur.execute(query, args)
 
-        if fetch:
-            rows = cur.fetchall()
-            return rows[0] if one and rows else rows
+        if commit:
+            conn.commit()
+            return None
 
-        conn.commit()
+        rows = cur.fetchall()
+        return rows[0] if one and rows else rows
     finally:
         conn.close()
+
 
 def init_db():
     query_db("""
