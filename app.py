@@ -51,13 +51,17 @@ def init_db():
     """, commit=True)
 
     query_db("""
+    query_db("""
     CREATE TABLE IF NOT EXISTS parking_logs (
         id SERIAL PRIMARY KEY,
         plate_number VARCHAR(50),
-        entry_time TIMESTAMP,
-        exit_time TIMESTAMP,
+        time_in TIMESTAMP,
+        time_out TIMESTAMP,
+        parking_area VARCHAR(50),
         fee NUMERIC(10,2)
     );
+    """, commit=True)
+
     """, commit=True)
 
 init_db()
