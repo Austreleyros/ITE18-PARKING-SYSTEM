@@ -36,7 +36,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "SUPERSECRETKEY")
 DB_HOST = os.environ.get("DB_HOST", "localhost")
 DB_NAME = os.environ.get("DB_NAME", "parking_system")
 DB_USER = os.environ.get("DB_USER", "postgres")
-DB_PASS = os.environ.get("DB_PASS", "M2faIu7ujlBHoC0Wnuxeis1dxFCcffgn")  # replace with env var
+DB_PASS = os.environ.get("DB_PASS", "leyrosxvi")  # replace with env var
 DB_PORT = 5432
 SSL_MODE = "disable"
 
