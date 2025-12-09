@@ -20,7 +20,7 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL is not set")
 
-ddef query_db(query, args=(), one=False, commit=False, fetch=True):
+def query_db(query, args=(), one=False, commit=False, fetch=True):
     conn = psycopg2.connect(DATABASE_URL, sslmode="require")
     try:
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
