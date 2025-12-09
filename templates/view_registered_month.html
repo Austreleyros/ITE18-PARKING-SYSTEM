@@ -1,0 +1,37 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registered Vehicles for {{ month }}</title>
+</head>
+<body>
+
+    <h2>Registered Vehicles — {{ month }}</h2>
+
+    <table border="1" cellpadding="8">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Plate Number</th>
+                <th>Owner Name</th>
+                <th>Vehicle Model</th>
+                <th>Created At</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for v in vehicles %}
+            <tr>
+                <td>{{ v.id }}</td>
+                <td>{{ v.plate_number }}</td>
+                <td>{{ v.owner_name }}</td>
+                <td>{{ v.vehicle_model }}</td>
+                <td>{{ v.created_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>
+
