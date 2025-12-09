@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Daily Entry Summary</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f0f0; padding: 20px; }
+        h2 { text-align: center; color: lightgreen; }
+        table { width: 100%; border-collapse: collapse; background: #fff; margin-top: 20px; }
+        th { background: lightgreen; color: white; padding: 12px; }
+        td { padding: 12px; border: 1px solid #ddd; text-align: center; }
+        a { color: lightgreen; text-decoration: none; font-weight: bold; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<h2>Daily Entry Summary</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Total Entries</th>
+            <th>Total Exits</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for row in summary %}
+        <tr>
+            <td><a href="/view_daily/{{ row.date }}">{{ row.date }}</a></td>
+            <td>{{ row.total_entries }}</td>
+            <td>{{ row.total_exits }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>
