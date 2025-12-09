@@ -1,60 +1,68 @@
-
-# app.py (FULL FIXED VERSION WITH WORKING ADMIN LOGIN)
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 import psycopg2
 import psycopg2.extras
 import qrcode
 import os
-from urllib.parse import urlparse  # ✅ Add this!
-from datetime import datetime, date
-import time
 import json
-
-
+import time
+from datetime import datetime
+from urllib.parse import urlparse
 
 # -----------------------------
-# QR Code Folder (LOCAL + RENDER SAFE)
+# App setup
 # -----------------------------
+app = Flask(__name__)
+
+app.secret_key = os.environ.get("SECRET_KEY", "SUPERSECRETKEY")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "ADMIN")
+
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL is not set")
+
+def query_db(query, args=(), fetch=True, one=False):
+    conn = psycopg2.connect(DATABASE_URL, sslmode="require")
+    try:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute(query, args)
+
+        if fetch:
+            rows = cur.fetchall()
+            return rows[0] if one and rows else rows
+
+        conn.commit()
+    finally:
+        conn.close()
+
+# -----------------------------
+# Database (RENDER SAFE)
 if "RENDER" in os.environ:
-    # Render provides a writable /tmp folder
-    QR_FOLDER = os.path.join("/tmp", "qrcodes")
+    QR_FOLDER = "/tmp/qrcodes"
 else:
-    # Local: use static folder
     QR_FOLDER = os.path.join("static", "qrcodes")
 
-# Ensure folder exists
 os.makedirs(QR_FOLDER, exist_ok=True)
 
-
-
-
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "ADMIN")
-SECRET_KEY = os.environ.get("SECRET_KEY", "SUPERSECRETKEY")
 # -----------------------------
-# Database Config
+# Load Config
 # -----------------------------
-DB_HOST = "localhost"
-DB_NAME = "parking_system"
-DB_USER = "postgres"
-DB_PASS = "leyrosxvi"  # change to your local password
-DB_PORT = 5432
-SSL_MODE = "disable"
+CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config.json")
+DEFAULT_CONFIG = {
+    "home_title": "QR-BASED PARKING MANAGEMENT SYSTEM",
+    "home_subtitle": "Manage vehicles and parking logs",
+    "home_left_text": "Welcome!",
+    "home_right_text": "Register your vehicle below."
+}
 
-# If DATABASE_URL exists (Render / production)
-if "DATABASE_URL" in os.environ:
-    url = urlparse(os.environ["DATABASE_URL"])
-    DB_USER = url.username
-    DB_PASS = url.password
-    DB_HOST = url.hostname
-    DB_PORT = url.port
-    DB_NAME = url.path[1:]  # remove leading '/'
-    SSL_MODE = "require"  # Render DB requires SSL
+try:
+    with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+        CONFIG = json.load(f)
+except Exception:
+    CONFIG = DEFAULT_CONFIG
 
-# Now DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT, SSL_MODE
-# are correct depending on environment
-app = Flask(__name__)
-app.secret_key = SECRET_KEY
-
+@app.context_processor
+def inject_config():
+    return {"config": CONFIG}
 # -----------------------------
 # QR Code Folder
 # -----------------------------
@@ -83,61 +91,20 @@ def inject_config():
     return {"config": CONFIG}
 
 # -----------------------------
-# Database Helper
-# -----------------------------
-def query_db(query, args=(), fetch=True, one=False):
-    conn = None
-    try:
-        conn = psycopg2.connect(
-            host=DB_HOST,
-            dbname=DB_NAME,
-            user=DB_USER,
-            password=DB_PASS,
-            port=DB_PORT,
-            sslmode=SSL_MODE
-        )
-        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cur.execute(query, args)
-
-        if fetch:
-            data = cur.fetchall()
-            if one:
-                return data[0] if data else None
-            return data
-
-        conn.commit()
-        return None
-    finally:
-        if conn:
-            conn.close()
-
-
-
-# -----------------------------
-# Cooldown
-# -----------------------------
 scan_cooldown = {}
 COOLDOWN_SEC = 2.5
 
-
-
-# -----------------------------
-# Extract plate from QR text
-# -----------------------------
-def extract_plate(qr_text: str):
-    if not qr_text:
+def extract_plate(text=""):
+    if not text:
         return ""
-    first_line = qr_text.splitlines()[0].strip()
-    if first_line.lower().startswith("plate:"):
-        return first_line.split(":", 1)[1].strip()
-    return first_line
+    first = text.splitlines()[0].strip()
+    if first.lower().startswith("plate:"):
+        return first.split(":", 1)[1].strip()
+    return first
 
 
 
-# -----------------------------
-# Registration
-# -----------------------------
-# -----------------------------
+
 # Registration (LOCAL + RENDER SAFE QR)
 # -----------------------------
 @app.route("/", methods=["GET", "POST"])
