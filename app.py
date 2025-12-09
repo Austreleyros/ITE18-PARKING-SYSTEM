@@ -48,9 +48,8 @@ def init_db():
         password VARCHAR(255),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
-    """, commit=True)
+""", commit=True)
 
-    query_db("""
     query_db("""
     CREATE TABLE IF NOT EXISTS parking_logs (
         id SERIAL PRIMARY KEY,
@@ -62,9 +61,8 @@ def init_db():
     );
     """, commit=True)
 
-    """, commit=True)
 
-init_db()
+
 
 
 # -----------------------------
