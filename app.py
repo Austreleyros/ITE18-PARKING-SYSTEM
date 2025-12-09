@@ -34,6 +34,29 @@ def query_db(query, args=(), fetch=True, one=False):
     finally:
         conn.close()
 
+def init_db():
+    query_db("""
+    CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(100),
+        password VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """, commit=True)
+
+    query_db("""
+    CREATE TABLE IF NOT EXISTS parking_logs (
+        id SERIAL PRIMARY KEY,
+        plate_number VARCHAR(50),
+        entry_time TIMESTAMP,
+        exit_time TIMESTAMP,
+        fee NUMERIC(10,2)
+    );
+    """, commit=True)
+
+init_db()
+
+
 # -----------------------------
 # Database (RENDER SAFE)
 if "RENDER" in os.environ:
