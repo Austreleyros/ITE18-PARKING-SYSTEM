@@ -1,7 +1,9 @@
-Flask==2.3.2
-psycopg2-binary==2.9.8
-qrcode==7.4
-Pillow==10.1.0
+Flask
+psycopg2-binary
+qrcode[pil]
+Pillow>=10.4.0
+
+
 
 
 
