@@ -1,4 +1,5 @@
 Flask
+gunicorn
 psycopg2-binary
 qrcode[pil]
 Pillow>=10.4.0
