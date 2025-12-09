@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,3 +37,43 @@
 </body>
 </html>
 
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration Success</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+        .qr-container {
+            margin-top: 20px;
+        }
+        img {
+            width: 250px;
+            height: 250px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Vehicle Registered Successfully!</h1>
+    <p>Plate Number: <strong>{{ plate_number }}</strong></p>
+
+    <div class="qr-container">
+        {% if qr_base64 %}
+            <!-- Render: QR from base64 -->
+            <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR Code">
+        {% else %}
+            <!-- Local: QR from static folder -->
+            <img src="{{ url_for('static', filename='qrcodes/' + plate_number + '.png') }}" alt="QR Code">
+        {% endif %}
+    </div>
+
+    <p><a href="{{ url_for('register') }}">Register Another Vehicle</a></p>
+</body>
+</html>
+
+>>>>>>> d5f69a563a575d89a594fe524ccbfb88790fcbe9

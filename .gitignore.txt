@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 __pycache__/
 *.pyc
 *.pyo
@@ -5,3 +6,12 @@ __pycache__/
 .env
 .venv/
 instance/
+=======
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.venv/
+instance/
+>>>>>>> d5f69a563a575d89a594fe524ccbfb88790fcbe9
