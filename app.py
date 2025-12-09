@@ -33,13 +33,14 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "SUPERSECRETKEY")
 # -----------------------------
 # Database Config
 # -----------------------------
-DB_HOST = os.environ.get("DB_HOST", "localhost")
-DB_NAME = os.environ.get("DB_NAME", "parking_system")
-DB_USER = os.environ.get("DB_USER", "postgres")
-DB_PASS = os.environ.get("DB_PASS", "leyrosxvi")  # replace with env var
+DB_HOST = "localhost"
+DB_NAME = "parking_system"
+DB_USER = "postgres"
+DB_PASS = "leyrosxvi"  # change to your local password
 DB_PORT = 5432
 SSL_MODE = "disable"
 
+# If DATABASE_URL exists (Render / production)
 if "DATABASE_URL" in os.environ:
     url = urlparse(os.environ["DATABASE_URL"])
     DB_USER = url.username
@@ -47,7 +48,10 @@ if "DATABASE_URL" in os.environ:
     DB_HOST = url.hostname
     DB_PORT = url.port
     DB_NAME = url.path[1:]  # remove leading '/'
-    SSL_MODE = "require"
+    SSL_MODE = "require"  # Render DB requires SSL
+
+# Now DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT, SSL_MODE
+# are correct depending on environment
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
