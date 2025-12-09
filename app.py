@@ -41,15 +41,22 @@ def query_db(query, args=(), one=False, commit=False, fetch=True):
 
 
 def init_db():
+    """Initialize database tables and fix missing columns (safe for Render)."""
+    
+    # USERS table
     query_db("""
     CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
-        username VARCHAR(100),
-        password VARCHAR(255),
+        full_name VARCHAR(100),
+        id_number VARCHAR(50),
+        vehicle_type VARCHAR(50),
+        mobile_no VARCHAR(50),
+        plate_number VARCHAR(50) UNIQUE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
-""", commit=True)
+    """, commit=True)
 
+    # PARKING LOGS table
     query_db("""
     CREATE TABLE IF NOT EXISTS parking_logs (
         id SERIAL PRIMARY KEY,
@@ -60,6 +67,26 @@ def init_db():
         fee NUMERIC(10,2)
     );
     """, commit=True)
+
+    # Ensure missing columns exist in existing parking_logs
+    try:
+        query_db("ALTER TABLE parking_logs ADD COLUMN IF NOT EXISTS time_out TIMESTAMP;", commit=True)
+        query_db("ALTER TABLE parking_logs ADD COLUMN IF NOT EXISTS parking_area VARCHAR(50);", commit=True)
+        query_db("ALTER TABLE parking_logs ADD COLUMN IF NOT EXISTS fee NUMERIC(10,2);", commit=True)
+    except Exception as e:
+        print("Warning: Could not alter parking_logs table:", e)
+
+    # PARKING AREAS table
+    query_db("""
+    CREATE TABLE IF NOT EXISTS parking_areas (
+        area_code VARCHAR(10) PRIMARY KEY,
+        area_name VARCHAR(100),
+        capacity INT DEFAULT 0,
+        current_count INT DEFAULT 0
+    );
+    """, commit=True)
+
+    print("✅ Database initialized or verified successfully.")
 
 
 
@@ -979,6 +1006,7 @@ def view_overstay():
 # Run App
 # -----------------------------
 if __name__ == "__main__":
+    init_db()
     debug_mode = not bool(os.environ.get("RENDER"))  # debug only if local
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=debug_mode)
 
